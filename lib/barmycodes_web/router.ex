@@ -18,6 +18,7 @@ defmodule BarmycodesWeb.Router do
 
     get "/", BarcodeController, :index
     get "/png", BarcodeController, :png
+    get "/pdf", BarcodeController, :pdf
   end
 
   # Other scopes may use custom stacks.

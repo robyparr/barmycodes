@@ -12,6 +12,12 @@
                          title: "Download a PNG image of this barcode" do %>
                   <i data-feather="image" class="feather"></i>
                 <% end %>
+
+                <%= link to: Routes.barcode_path(@conn, :pdf, @conn.query_params),
+                         class: "button icon-only text-white",
+                         title: "Download a PDF file of this barcode" do %>
+                  <i data-feather="file" class="feather"></i>
+                <% end %>
               </div>
             </div>
             <div class="card-content flex justify-center">
