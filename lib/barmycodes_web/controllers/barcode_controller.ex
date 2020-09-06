@@ -25,20 +25,22 @@ defmodule BarmycodesWeb.BarcodeController do
     barcodes =
       scrub_barcode_values(barcode_values)
       |> Enum.map(& Barcodes.generate!(barcodes_type, &1))
-      |> List.first()
 
-    pdf =
-      Pdf.build([size: [barcodes.width, barcodes.height], compress: true], fn pdf ->
-        pdf
-        |> Pdf.add_image({0, 0}, barcodes.image_path)
-        |> Pdf.export()
-      end)
+    first_barcode = List.first(barcodes)
+    {:ok, pdf} = Pdf.new([size: [first_barcode.width, first_barcode.height], compress: true])
+
+    barcodes
+    |> Enum.with_index
+    |> Enum.each(fn {barcode, index} ->
+      if index > 0, do: Pdf.add_page(pdf, [barcode.width, barcode.height])
+      Pdf.add_image(pdf, {0, 0}, barcode.image_path)
+    end)
 
     options =[
       filename: "barmycodes.pdf",
       disposition: :inline,
     ]
-    send_download(conn, {:binary, pdf}, options)
+    send_download(conn, {:binary, Pdf.export(pdf)}, options)
   end
 
   defp scrub_barcode_values(barcode_values) do
