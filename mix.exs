@@ -47,6 +47,7 @@ defmodule Barmycodes.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:barlix, "~> 0.6.0"},
       {:mogrify, "~> 0.8.0"},
+      {:eqrcode, "~> 0.1.7"},
     ]
   end
 

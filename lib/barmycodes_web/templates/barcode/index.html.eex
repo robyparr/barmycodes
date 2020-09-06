@@ -7,8 +7,8 @@
             <div class="card-header">
               <span class="card-title"><%= barcode.value %></span>
             </div>
-            <div class="card-content">
-              <img src="data:image/png;base64, <%= barcode.encoded_image %>" />
+            <div class="card-content flex justify-center">
+              <img src="data:image/png;base64, <%= barcode.encoded_image %>" style="max-width: 300px;" />
             </div>
           </div>
         </div>

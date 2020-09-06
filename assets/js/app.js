@@ -17,4 +17,17 @@ import Sidebar from "./components/Sidebar"
 window.Sidebar = Sidebar
 
 const feather = require("feather-icons")
-document.addEventListener('DOMContentLoaded', () => feather.replace())
+window.renderIcons =
+  function() {
+    document.querySelectorAll('.select-wrapper').forEach(wrapper => {
+      var iconChild = document.createElement('i')
+      iconChild.dataset.feather = 'chevron-down'
+      iconChild.classList.add('chevron')
+
+      wrapper.appendChild(iconChild)
+    })
+
+    document.querySelectorAll('[data-feather=""]').forEach(el => el.remove())
+    feather.replace()
+  }
+document.addEventListener('DOMContentLoaded', renderIcons)

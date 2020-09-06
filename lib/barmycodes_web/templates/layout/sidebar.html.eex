@@ -12,11 +12,14 @@
   <textarea name="barcodes"
             autofocus="autofocus"
             placeholder="Enter each of your barcodes on a new line."><%= Enum.join(@conn.params["b"], "\n") %></textarea>
-  <div class="text-right text-gray-400 text-sm">CTRL/CMD + Enter to generate barcodes</div>
-  <div class="text-right">
-    <button type="button" id="submit-barcodes" class="button">Bar My Codes!</button>
-  </div>
+  <div class="text-right text-gray-400 text-sm -mt-4 mb-4">CTRL/CMD + Enter to generate barcodes</div>
   <%= form_for @conn, Routes.barcode_path(@conn, :index), [method: :get, id: "barcode-form"], fn f -> %>
+    <div class="flex items-center justify-between">
+      <div class="select-wrapper w-1/2 mb-0">
+        <%= select f, :type, [{"Code128", "code128"}, {"QR Code", "qr_code"}] %>
+      </div>
+      <button type="submit" id="submit-barcodes" class="button">Bar My Codes!</button>
+    </div>
   <% end %>
 
   <div class="overlay">&nbsp;</div>
@@ -28,8 +31,10 @@
   var barcodeTextArea = document.querySelector('textarea[name="barcodes"]');
   var submitBarcodesButton = document.querySelector('#submit-barcodes');
 
-  submitBarcodesButton.addEventListener('click', function(e) {
-    barcodeForm.innerHTML = '';
+  barcodeForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    barcodeForm.querySelectorAll('input[type="hidden"]').forEach(elem => elem.remove());
     var barcodeValues = barcodeTextArea.value.split('\n');
     barcodeValues.forEach(value => {
       var hiddenField = document.createElement('input');

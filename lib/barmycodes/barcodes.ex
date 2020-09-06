@@ -19,6 +19,16 @@ defmodule Barmycodes.Barcodes do
     {:ok, barcode}
   end
 
+  def generate("qr_code", value) do
+    encoded_barcode =
+      EQRCode.encode(value)
+      |> EQRCode.png()
+      |> :base64.encode()
+
+    barcode = %Barcode{type: "qr", value: value, encoded_image: encoded_barcode}
+    {:ok, barcode}
+  end
+
   defp temp_generation_path do
     "#{System.tmp_dir()}/#{Ecto.UUID.generate}"
   end

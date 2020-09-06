@@ -3,10 +3,11 @@ defmodule BarmycodesWeb.BarcodeController do
 
   alias Barmycodes.Barcodes
 
-  def index(conn, %{ "b" => barcode_values }) do
+  def index(conn, %{ "type" => barcodes_type, "b" => barcode_values }) do
     barcodes =
       Enum.uniq(barcode_values)
-      |> Enum.map(&(Barcodes.generate!("code128", &1)))
+      |> Enum.reject(& &1 == nil || String.trim(&1) == "")
+      |> Enum.map(& Barcodes.generate!(barcodes_type, &1))
 
     render(conn, "index.html", conn: conn, barcodes: barcodes)
   end

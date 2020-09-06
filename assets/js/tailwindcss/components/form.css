@@ -1,0 +1,32 @@
+label {
+  @apply block uppercase tracking-wide font-bold mb-2 text-gray-600;
+}
+
+input:not([type="submit"]):not([type="color"]):not([type="checkbox"]),
+textarea,
+select {
+  @apply bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full
+         py-2 px-4 text-gray-700 leading-tight mb-4;
+
+  &:focus {
+    @apply outline-none bg-white border-indigo-500;
+  }
+
+  &.small {
+    @apply py-1 px-2;
+  }
+
+  &:disabled { @apply opacity-50 cursor-not-allowed; }
+}
+
+.select-wrapper {
+  @apply relative flex items-center mb-4;
+
+  select { @apply pr-8 mb-0; }
+
+  .chevron {
+    @apply inline-block absolute pointer-events-none;
+    right: 0.5rem;
+    top: 0.6rem;
+  }
+}

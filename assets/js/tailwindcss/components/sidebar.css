@@ -6,13 +6,12 @@
 }
 
 .sidebar {
-  @apply bg-primary-500 text-white p-4;
+  @apply bg-primary-500 p-4;
 
   h1 {
-    @apply text-2xl border-b border-gray-500 text-center -mx-4 -mt-2 pb-2 mb-10;
+    @apply text-2xl border-b border-gray-500 text-center -mx-4 -mt-2 pb-2 mb-10 text-white;
   }
 
-  label { @apply uppercase block text-gray-400; }
   textarea {
     @apply w-full text-black;
     min-height: 150px;
