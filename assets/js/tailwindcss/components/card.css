@@ -2,7 +2,7 @@
   @apply bg-white border rounded;
 
   .card-header {
-    @apply flex justify-between px-4 py-2 bg-primary-500 text-white rounded-t;
+    @apply flex items-center justify-between px-4 py-2 bg-primary-500 text-white rounded-t;
 
     .card-title {
       @apply text-2xl;

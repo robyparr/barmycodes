@@ -6,6 +6,13 @@
           <div class="card">
             <div class="card-header">
               <span class="card-title"><%= barcode.value %></span>
+              <div class="card-actions">
+                <%= link to: Routes.barcode_path(@conn, :png, @conn.query_params),
+                         class: "button icon-only text-white",
+                         title: "Download a PNG image of this barcode" do %>
+                  <i data-feather="image" class="feather"></i>
+                <% end %>
+              </div>
             </div>
             <div class="card-content flex justify-center">
               <img src="data:image/png;base64, <%= barcode.encoded_image %>" style="max-width: 300px;" />

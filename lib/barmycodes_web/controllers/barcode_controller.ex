@@ -11,4 +11,14 @@ defmodule BarmycodesWeb.BarcodeController do
 
     render(conn, "index.html", conn: conn, barcodes: barcodes)
   end
+
+  def png(conn, %{ "type" => barcode_type, "b" => barcode_value }) do
+    barcode_value = List.first(barcode_value)
+    barcode = Barcodes.generate!(barcode_type, barcode_value)
+
+    options = [
+      filename: "barmycodes_#{barcode_value}.png",
+    ]
+    send_download(conn, {:binary, barcode.image}, options)
+  end
 end

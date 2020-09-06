@@ -12,20 +12,31 @@ defmodule Barmycodes.Barcodes do
     |> Barlix.PNG.print(file: file_path, xdim: 3, margin: 2)
     add_value_label_to_barcode_image(file_path, value)
 
-    encoded_image = :base64.encode(File.read!(file_path))
+    image = File.read!(file_path)
+    barcode =
+      %Barcode{
+        type: "code128",
+        value: value,
+        image: image,
+        encoded_image: :base64.encode(image),
+      }
     File.rm! file_path
 
-    barcode = %Barcode{type: "code128", value: value, encoded_image: encoded_image}
     {:ok, barcode}
   end
 
   def generate("qr_code", value) do
-    encoded_barcode =
+    barcode =
       EQRCode.encode(value)
       |> EQRCode.png()
-      |> :base64.encode()
 
-    barcode = %Barcode{type: "qr", value: value, encoded_image: encoded_barcode}
+    barcode =
+      %Barcode{
+        type: "qr",
+        value: value,
+        image: barcode,
+        encoded_image: :base64.encode(barcode),
+      }
     {:ok, barcode}
   end
 

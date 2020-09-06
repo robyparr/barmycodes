@@ -1,3 +1,3 @@
 defmodule Barmycodes.Barcodes.Barcode do
-  defstruct [:type, :value, :encoded_image]
+  defstruct [:type, :value, :image, :encoded_image]
 end

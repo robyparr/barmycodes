@@ -17,6 +17,7 @@ defmodule BarmycodesWeb.Router do
     pipe_through :browser
 
     get "/", BarcodeController, :index
+    get "/png", BarcodeController, :png
   end
 
   # Other scopes may use custom stacks.
