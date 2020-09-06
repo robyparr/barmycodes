@@ -20,6 +20,6 @@
   }
 
   .content {
-    @apply w-full md:w-3/4 p-4;
+    @apply w-full md:w-3/4 p-4 overflow-y-auto overflow-x-hidden;
   }
 }

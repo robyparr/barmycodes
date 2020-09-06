@@ -1,0 +1,44 @@
+<header class="mobile-navbar">
+  <button id="toggle-sidebar" type="button">
+    <i data-feather="menu"></i>
+  </button>
+  <h1>Bar My Codes</h1>
+</header>
+
+<section class="sidebar">
+  <h1>Bar My Codes</h1>
+
+  <label for="barcodes">Barcodes</label>
+  <textarea name="barcodes"
+            autofocus="autofocus"
+            placeholder="Enter each of your barcodes on a new line."><%= Enum.join(@conn.params["b"], "\n") %></textarea>
+  <div class="text-right text-gray-400 text-sm">CTRL/CMD + Enter to generate barcodes</div>
+  <div class="text-right">
+    <button type="button" id="submit-barcodes" class="button">Bar My Codes!</button>
+  </div>
+  <%= form_for @conn, Routes.barcode_path(@conn, :index), [method: :get, id: "barcode-form"], fn f -> %>
+  <% end %>
+
+  <div class="overlay">&nbsp;</div>
+</section>
+
+
+<script>
+  var barcodeForm = document.querySelector('#barcode-form');
+  var barcodeTextArea = document.querySelector('textarea[name="barcodes"]');
+  var submitBarcodesButton = document.querySelector('#submit-barcodes');
+
+  submitBarcodesButton.addEventListener('click', function(e) {
+    barcodeForm.innerHTML = '';
+    var barcodeValues = barcodeTextArea.value.split('\n');
+    barcodeValues.forEach(value => {
+      var hiddenField = document.createElement('input');
+      hiddenField.type = 'hidden';
+      hiddenField.value = value;
+      hiddenField.name = 'b[]'
+      barcodeForm.appendChild(hiddenField);
+    });
+
+    barcodeForm.submit();
+  });
+</script>

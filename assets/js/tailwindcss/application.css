@@ -4,5 +4,8 @@
 @import "./layouts/sidebar_layout.css";
 
 @import "./components/sidebar.css";
+@import "./components/button.css";
+@import "./components/card.css";
+@import "./components/grid.css";
 
 @import "tailwindcss/utilities";

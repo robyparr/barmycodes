@@ -1,0 +1,22 @@
+<section>
+  <%= if Enum.any?(@barcodes) do %>
+    <div class="row">
+      <%= for barcode <- @barcodes do %>
+        <div class="column md6 mb-4">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><%= barcode.value %></span>
+            </div>
+            <div class="card-content">
+              <img src="data:image/png;base64, <%= barcode.encoded_image %>" />
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="h-screen w-full flex items-center justify-center -my-4 text-3xl text-gray-600">
+      Your barcodes will showup here.
+    </div>
+  <% end %>
+</section>

@@ -14,16 +14,7 @@
     </style>
   </head>
   <body class="sidebar-layout">
-    <header class="mobile-navbar">
-      <button id="toggle-sidebar" type="button">
-        <i data-feather="menu"></i>
-      </button>
-      <h1>Bar My Codes</h1>
-    </header>
-    <section class="sidebar">
-      Sidebar
-      <div class="overlay">&nbsp;</div>
-    </section>
+    <%= render "sidebar.html", conn: @conn %>
     <main role="main" class="content">
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
