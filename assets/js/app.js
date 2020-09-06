@@ -16,3 +16,5 @@ import "phoenix_html"
 import Sidebar from "./components/Sidebar"
 window.Sidebar = Sidebar
 
+const feather = require("feather-icons")
+document.addEventListener('DOMContentLoaded', () => feather.replace())
