@@ -1,0 +1,25 @@
+.sidebar-layout {
+  @apply h-screen w-screen flex flex-col md:flex-row;
+
+  .mobile-navbar {
+    @apply w-full md:hidden flex items-center;
+  }
+
+  .sidebar {
+    @apply w-3/4 md:w-1/4 absolute md:relative inset-0
+           transition-all ease-in-out duration-500;
+
+    &:not(.opening) { @apply hidden md:block; }
+    &:not(.open) { @apply transform -translate-x-full md:translate-x-0; }
+
+    .overlay {
+      @apply fixed inset-0 bg-black opacity-25;
+
+      &:not(.visible) { @apply hidden; }
+    }
+  }
+
+  .content {
+    @apply w-full md:w-3/4 p-4;
+  }
+}

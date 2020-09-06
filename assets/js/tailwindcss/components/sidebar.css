@@ -1,0 +1,10 @@
+.mobile-navbar {
+  @apply bg-primary-500 px-4 py-2 text-white relative;
+
+  #toggle-sidebar { @apply absolute left-0 ml-4; }
+  h1 { @apply w-full text-center; }
+}
+
+.sidebar {
+  @apply bg-primary-500;
+}
