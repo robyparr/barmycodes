@@ -30,7 +30,13 @@ func newCode128BarCode(w io.Writer, text string) error {
 		return err
 	}
 
-	scaledBc, err := barcode.Scale(bcode, bcode.Bounds().Dx()*3, 120)
+	widthScale := bcode.Bounds().Dx() * 3
+	textLen := len(text)
+	if textLen >= 10 {
+		widthScale += textLen * 15
+	}
+
+	scaledBc, err := barcode.Scale(bcode, widthScale, 120)
 	if err != nil {
 		return err
 	}

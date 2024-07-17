@@ -7,15 +7,28 @@ import (
 )
 
 func TestNewCode128BarCode(t *testing.T) {
-	want, err := os.ReadFile("testdata/barcode_Test.png")
-	if err != nil {
-		t.Fatal(err)
+	testCases := []struct {
+		name        string
+		content     string
+		fixturePath string
+	}{
+		{"Basic barcode", "Test", "testdata/barcode_Test.png"},
+		{"auto-resizing", "A long barcode with auto-resizing", "testdata/barcode_Long.png"},
 	}
 
-	got := new(bytes.Buffer)
-	newCode128BarCode(got, "Test")
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			want, err := os.ReadFile(testCase.fixturePath)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	if !bytes.Equal(got.Bytes(), want) {
-		t.Error("Generated barcode does not match testdata/barcode_Test.png")
+			got := new(bytes.Buffer)
+			newCode128BarCode(got, testCase.content)
+
+			if !bytes.Equal(got.Bytes(), want) {
+				t.Errorf("Generated barcode does not match %s\n", testCase.fixturePath)
+			}
+		})
 	}
 }
