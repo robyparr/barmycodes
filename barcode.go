@@ -20,6 +20,8 @@ var (
 	//go:embed fonts/opensans/OpenSans-Regular.ttf
 	fontFile       []byte
 	labelMarginTop = 10
+	imgPaddingX    = 20
+	imgPaddingY    = 5
 )
 
 func newCode128BarCode(w io.Writer, text string) error {
@@ -28,7 +30,7 @@ func newCode128BarCode(w io.Writer, text string) error {
 		return err
 	}
 
-	scaledBc, err := barcode.Scale(bcode, bcode.Bounds().Dx()*2, 150)
+	scaledBc, err := barcode.Scale(bcode, bcode.Bounds().Dx()*3, 120)
 	if err != nil {
 		return err
 	}
@@ -55,22 +57,22 @@ func addLabel(bcode barcode.Barcode) image.Image {
 	labelWidth := int((labelBounds.Max.X - labelBounds.Min.X) / 64)
 	labelHeight := int((labelBounds.Max.Y - labelBounds.Min.Y) / 64)
 
-	imgHeight := labelHeight + bcode.Bounds().Dy() + labelMarginTop
+	imgHeight := labelHeight + bcode.Bounds().Dy() + labelMarginTop + (imgPaddingY * 2)
 	imgWidth := labelWidth
 	if bcode.Bounds().Dx() > imgWidth {
 		imgWidth = bcode.Bounds().Dx()
 	}
+	imgWidth += (imgPaddingX * 2)
 
-	img := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
-
-	backgroundRect := image.Rect(0, 0, imgWidth, imgHeight)
-	draw.Draw(img, backgroundRect, &image.Uniform{color.White}, bcode.Bounds().Min, draw.Over)
+	imgRect := image.Rect(-(imgPaddingX * 2), -(imgPaddingY * 2), imgWidth, imgHeight)
+	img := image.NewRGBA(imgRect)
+	draw.Draw(img, imgRect, &image.Uniform{color.White}, bcode.Bounds().Min, draw.Over)
 
 	barcodeRect := image.Rect(0, 0, bcode.Bounds().Dx(), bcode.Bounds().Dy())
 	draw.Draw(img, barcodeRect, bcode, bcode.Bounds().Min, draw.Over)
 
 	labelOffsetY := bcode.Bounds().Dy() + labelMarginTop - int(labelBounds.Min.Y/64)
-	labelOffsetX := (imgWidth - labelWidth) / 2
+	labelOffsetX := ((imgWidth - labelWidth) / 2) - imgPaddingX
 
 	point := fixed.Point26_6{
 		X: fixed.Int26_6(labelOffsetX * 64),
