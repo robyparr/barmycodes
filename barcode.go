@@ -10,15 +10,16 @@ import (
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/code128"
 	"golang.org/x/image/font"
-	"golang.org/x/image/font/basicfont"
+	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
+
+	_ "embed"
 )
 
 var (
-	labelFontFace  = basicfont.Face7x13
-	labelMarginTop = 2
-
-	barcodePadding = 10
+	//go:embed fonts/opensans/OpenSans-Regular.ttf
+	fontFile       []byte
+	labelMarginTop = 10
 )
 
 func newCode128BarCode(w io.Writer, text string) error {
@@ -41,6 +42,13 @@ func newCode128BarCode(w io.Writer, text string) error {
 }
 
 func addLabel(bcode barcode.Barcode) image.Image {
+	labelFont, _ := opentype.Parse(fontFile)
+	labelFontFace, _ := opentype.NewFace(labelFont, &opentype.FaceOptions{
+		Size:    float64(20),
+		DPI:     200,
+		Hinting: font.HintingNone,
+	})
+
 	// Based on https://github.com/boombuler/barcode/wiki/Content-String
 	label := bcode.Content()
 	labelBounds, _ := font.BoundString(labelFontFace, label)
