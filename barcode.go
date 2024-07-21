@@ -29,7 +29,7 @@ var (
 
 type nowFunc = func() time.Time
 
-func newCode128BarCode(w io.Writer, fileType string, text string, now nowFunc) error {
+func newCode128BarCode(w io.Writer, fileType string, text string, pdfPgSize pdfPageSize, now nowFunc) error {
 	bcode, err := code128.Encode(text)
 	if err != nil {
 		return err
@@ -53,12 +53,20 @@ func newCode128BarCode(w io.Writer, fileType string, text string, now nowFunc) e
 	}
 
 	if fileType == "pdf" {
-		pdf := fpdf.New("P", "pt", "A4", "")
+		pdfUnit := "pt"
+		pageSize := fpdf.SizeType{Wd: float64(widthScale), Ht: float64(140)}
+		if pdfPgSize.unit != "" {
+			pdfUnit = pdfPgSize.unit
+			pageSize.Wd = float64(pdfPgSize.width)
+			pageSize.Ht = float64(pdfPgSize.height)
+		}
+
+		pdf := fpdf.New("P", pdfUnit, "A4", "")
 		pdf.SetCreationDate(now())
 		pdf.SetModificationDate(now())
-		pdf.AddPageFormat("P", fpdf.SizeType{Wd: float64(widthScale), Ht: float64(140)})
+		pdf.AddPageFormat("P", pageSize)
 		pdf.RegisterImageOptionsReader("barcode", fpdf.ImageOptions{ImageType: "PNG"}, pngBuffer)
-		pdf.ImageOptions("barcode", 0, 0, 0, 0, false, fpdf.ImageOptions{}, 0, "")
+		pdf.ImageOptions("barcode", 0, 0, pageSize.Wd, pageSize.Ht, false, fpdf.ImageOptions{}, 0, "")
 
 		err := pdf.Output(w)
 		if err != nil {
