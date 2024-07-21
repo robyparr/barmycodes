@@ -1,14 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/png"
 	"io"
+	"time"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/code128"
+	"github.com/go-pdf/fpdf"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
@@ -24,7 +27,9 @@ var (
 	imgPaddingY    = 5
 )
 
-func newCode128BarCode(w io.Writer, text string) error {
+type nowFunc = func() time.Time
+
+func newCode128BarCode(w io.Writer, fileType string, text string, now nowFunc) error {
 	bcode, err := code128.Encode(text)
 	if err != nil {
 		return err
@@ -41,9 +46,26 @@ func newCode128BarCode(w io.Writer, text string) error {
 		return err
 	}
 
-	err = png.Encode(w, addLabel(scaledBc))
+	pngBuffer := new(bytes.Buffer)
+	err = png.Encode(pngBuffer, addLabel(scaledBc))
 	if err != nil {
 		return err
+	}
+
+	if fileType == "pdf" {
+		pdf := fpdf.New("P", "pt", "A4", "")
+		pdf.SetCreationDate(now())
+		pdf.SetModificationDate(now())
+		pdf.AddPageFormat("P", fpdf.SizeType{Wd: float64(widthScale), Ht: float64(140)})
+		pdf.RegisterImageOptionsReader("barcode", fpdf.ImageOptions{ImageType: "PNG"}, pngBuffer)
+		pdf.ImageOptions("barcode", 0, 0, 0, 0, false, fpdf.ImageOptions{}, 0, "")
+
+		err := pdf.Output(w)
+		if err != nil {
+			return err
+		}
+	} else {
+		pngBuffer.WriteTo(w)
 	}
 
 	return nil
