@@ -10,36 +10,36 @@ func main() {
 	cli := cli{}
 	cli.parse()
 
-	barcodes := generateBarcodes(cli.values)
+	barcodes, err := generateBarcodes(cli.values, cli.barcodeType)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	if cli.fileType == "pdf" {
-		err := savePDF(barcodes, cli.pdfPageSize)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
+		err = savePDF(barcodes, cli.pdfPageSize)
 	} else {
-		err := savePNGImages(barcodes)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
+		err = savePNGImages(barcodes)
+	}
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
 
-func generateBarcodes(values []string) []barcode {
+func generateBarcodes(values []string, barcodeType string) ([]barcode, error) {
 	var barcodes []barcode
 	for _, value := range values {
-		barcode, err := newCode128BarCode(value)
+		barcode, err := generateBarcode(value, barcodeType)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error creating barcode:", err)
-			os.Exit(1)
+			return barcodes, err
 		}
 
 		barcodes = append(barcodes, barcode)
 	}
 
-	return barcodes
+	return barcodes, nil
 }
 
 func savePDF(barcodes []barcode, pageSize pdfPageSize) error {
@@ -68,6 +68,7 @@ func savePDF(barcodes []barcode, pageSize pdfPageSize) error {
 func savePNGImages(barcodes []barcode) error {
 	for _, barcode := range barcodes {
 		filename := fmt.Sprintf("%s.png", barcode.value)
+
 		file, err := os.Create(filename)
 		if err != nil {
 			return fmt.Errorf("Error creating file: %s", err)

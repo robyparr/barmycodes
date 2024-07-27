@@ -9,6 +9,7 @@ import (
 
 	bBarcode "github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/code128"
+	"github.com/boombuler/barcode/qr"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
@@ -16,12 +17,14 @@ import (
 	_ "embed"
 )
 
-var (
-	//go:embed fonts/opensans/OpenSans-Regular.ttf
-	fontFile       []byte
+//go:embed fonts/opensans/OpenSans-Regular.ttf
+var fontFile []byte
+
+const (
 	labelMarginTop = 10
 	imgPaddingX    = 20
 	imgPaddingY    = 5
+	qrCodePadding  = 60
 )
 
 type barcode struct {
@@ -31,32 +34,61 @@ type barcode struct {
 	height  int
 }
 
-func newCode128BarCode(text string) (barcode, error) {
-	bc := barcode{value: text, height: 120}
-	bcode, err := code128.Encode(text)
-	if err != nil {
-		return barcode{}, err
-	}
+func generateBarcode(text string, barcodeType string) (barcode, error) {
+	bc := barcode{value: text}
+	var img image.Image
+	var err error
 
-	bc.width = bcode.Bounds().Dx() * 3
-	textLen := len(text)
-	if textLen >= 10 {
-		bc.width += textLen * 15
-	}
-
-	scaledBc, err := bBarcode.Scale(bcode, bc.width, bc.height)
-	if err != nil {
-		return barcode{}, err
+	if barcodeType == "qr" {
+		img, err = generateQRCode(&bc)
+	} else {
+		img, err = generateCode128Barcode(&bc)
 	}
 
 	pngBuffer := new(bytes.Buffer)
-	err = png.Encode(pngBuffer, addLabel(scaledBc))
+	err = png.Encode(pngBuffer, img)
 	if err != nil {
 		return barcode{}, err
 	}
 
 	bc.pngData = pngBuffer.Bytes()
 	return bc, nil
+}
+
+func generateCode128Barcode(bc *barcode) (image.Image, error) {
+	bcode, err := code128.Encode(bc.value)
+	if err != nil {
+		return nil, err
+	}
+
+	bc.height = 120
+	bc.width = bcode.Bounds().Dx() * 3
+	if len(bc.value) >= 10 {
+		bc.width += len(bc.value) * 15
+	}
+
+	scaledBc, err := bBarcode.Scale(bcode, bc.width, bc.height)
+	if err != nil {
+		return nil, err
+	}
+
+	return addLabel(scaledBc), nil
+}
+
+func generateQRCode(bc *barcode) (image.Image, error) {
+	bc.height = 245
+	bc.width = 245
+	bcode, err := qr.Encode(bc.value, qr.H, qr.Unicode)
+	if err != nil {
+		return nil, err
+	}
+
+	scaledBc, err := bBarcode.Scale(bcode, bc.width, bc.height)
+	if err != nil {
+		return nil, err
+	}
+
+	return addBorder(scaledBc), nil
 }
 
 func addLabel(bcode bBarcode.Barcode) image.Image {
@@ -102,6 +134,18 @@ func addLabel(bcode bBarcode.Barcode) image.Image {
 		Dot:  point,
 	}
 	drawer.DrawString(label)
+
+	return img
+}
+
+func addBorder(bcode bBarcode.Barcode) image.Image {
+	imgRect := image.Rect(0, 0, bcode.Bounds().Dx()+qrCodePadding, bcode.Bounds().Dy()+qrCodePadding)
+	img := image.NewRGBA(imgRect)
+	draw.Draw(img, imgRect, &image.Uniform{color.White}, bcode.Bounds().Min, draw.Over)
+
+	offset := qrCodePadding / 2
+	barcodeRect := image.Rect(offset, offset, bcode.Bounds().Dx()+offset, bcode.Bounds().Dy()+offset)
+	draw.Draw(img, barcodeRect, bcode, bcode.Bounds().Min, draw.Over)
 
 	return img
 }

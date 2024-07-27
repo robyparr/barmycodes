@@ -9,11 +9,13 @@ import (
 func TestNewCode128BarCode(t *testing.T) {
 	testCases := []struct {
 		name        string
-		content     string
+		value       string
+		barcodeType string
 		fixturePath string
 	}{
-		{"Basic barcode", "Test", "testdata/barcode_Test.png"},
-		{"auto-resizing", "A long barcode with auto-resizing", "testdata/barcode_Long.png"},
+		{"Basic barcode", "Test", "code128", "testdata/barcode_Test.png"},
+		{"auto-resizing", "A long barcode with auto-resizing", "code128", "testdata/barcode_Long.png"},
+		{"QR Code", "Test", "qr", "testdata/barcode_QR_Test.png"},
 	}
 
 	for _, testCase := range testCases {
@@ -23,7 +25,7 @@ func TestNewCode128BarCode(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			got, err := newCode128BarCode(testCase.content)
+			got, err := generateBarcode(testCase.value, testCase.barcodeType)
 
 			if err != nil {
 				t.Fatalf("Expected no error but got %s\n", err)
