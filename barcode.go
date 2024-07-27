@@ -6,12 +6,9 @@ import (
 	"image/color"
 	"image/draw"
 	"image/png"
-	"io"
-	"time"
 
-	"github.com/boombuler/barcode"
+	bBarcode "github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/code128"
-	"github.com/go-pdf/fpdf"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
@@ -27,59 +24,42 @@ var (
 	imgPaddingY    = 5
 )
 
-type nowFunc = func() time.Time
+type barcode struct {
+	pngData []byte
+	value   string
+	width   int
+	height  int
+}
 
-func newCode128BarCode(w io.Writer, fileType string, text string, pdfPgSize pdfPageSize, now nowFunc) error {
+func newCode128BarCode(text string) (barcode, error) {
+	bc := barcode{value: text, height: 120}
 	bcode, err := code128.Encode(text)
 	if err != nil {
-		return err
+		return barcode{}, err
 	}
 
-	widthScale := bcode.Bounds().Dx() * 3
+	bc.width = bcode.Bounds().Dx() * 3
 	textLen := len(text)
 	if textLen >= 10 {
-		widthScale += textLen * 15
+		bc.width += textLen * 15
 	}
 
-	scaledBc, err := barcode.Scale(bcode, widthScale, 120)
+	scaledBc, err := bBarcode.Scale(bcode, bc.width, bc.height)
 	if err != nil {
-		return err
+		return barcode{}, err
 	}
 
 	pngBuffer := new(bytes.Buffer)
 	err = png.Encode(pngBuffer, addLabel(scaledBc))
 	if err != nil {
-		return err
+		return barcode{}, err
 	}
 
-	if fileType == "pdf" {
-		pdfUnit := "pt"
-		pageSize := fpdf.SizeType{Wd: float64(widthScale), Ht: float64(140)}
-		if pdfPgSize.unit != "" {
-			pdfUnit = pdfPgSize.unit
-			pageSize.Wd = float64(pdfPgSize.width)
-			pageSize.Ht = float64(pdfPgSize.height)
-		}
-
-		pdf := fpdf.New("P", pdfUnit, "A4", "")
-		pdf.SetCreationDate(now())
-		pdf.SetModificationDate(now())
-		pdf.AddPageFormat("P", pageSize)
-		pdf.RegisterImageOptionsReader("barcode", fpdf.ImageOptions{ImageType: "PNG"}, pngBuffer)
-		pdf.ImageOptions("barcode", 0, 0, pageSize.Wd, pageSize.Ht, false, fpdf.ImageOptions{}, 0, "")
-
-		err := pdf.Output(w)
-		if err != nil {
-			return err
-		}
-	} else {
-		pngBuffer.WriteTo(w)
-	}
-
-	return nil
+	bc.pngData = pngBuffer.Bytes()
+	return bc, nil
 }
 
-func addLabel(bcode barcode.Barcode) image.Image {
+func addLabel(bcode bBarcode.Barcode) image.Image {
 	labelFont, _ := opentype.Parse(fontFile)
 	labelFontFace, _ := opentype.NewFace(labelFont, &opentype.FaceOptions{
 		Size:    float64(20),

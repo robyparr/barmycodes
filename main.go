@@ -1,73 +1,88 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 )
-
-type cli struct {
-	content     string
-	fileType    string
-	pdfPageSize string
-}
-
-func (c *cli) parse() {
-	fileTypeFlag := flag.String("f", "png", "The output file type: pdf or png")
-	pdfPageSizeFlag := flag.String("s", "", "PDF page size: NNxNNmm or NNxNNin")
-	flag.Parse()
-
-	c.content = flag.Arg(0)
-	c.fileType = strings.ToLower(*fileTypeFlag)
-	c.pdfPageSize = strings.ToLower(*pdfPageSizeFlag)
-}
-
-type pdfPageSize struct {
-	width  int
-	height int
-	unit   string
-}
-
-func parsePdfPageSize(str string) pdfPageSize {
-	if str == "" {
-		return pdfPageSize{}
-	}
-
-	values := strings.SplitN(str, "x", 2)
-	unit := values[1][len(values[1])-2:]
-
-	fmt.Println(values)
-	width, _ := strconv.Atoi(values[0])
-	height, _ := strconv.Atoi(values[1][:len(values[1])-2])
-	return pdfPageSize{
-		width:  width,
-		height: height,
-		unit:   unit,
-	}
-}
 
 func main() {
 	cli := cli{}
 	cli.parse()
 
-	fileName := "barcode." + cli.fileType
-	file, err := os.Create(fileName)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error creating file:", err)
-		os.Exit(1)
-	}
-	defer file.Close()
+	barcodes := generateBarcodes(cli.values)
 
-	pageSize := parsePdfPageSize(cli.pdfPageSize)
-	err = newCode128BarCode(file, cli.fileType, cli.content, pageSize, time.Now)
+	if cli.fileType == "pdf" {
+		err := savePDF(barcodes, cli.pdfPageSize)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+	} else {
+		err := savePNGImages(barcodes)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+	}
+}
+
+func generateBarcodes(values []string) []barcode {
+	var barcodes []barcode
+	for _, value := range values {
+		barcode, err := newCode128BarCode(value)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Error creating barcode:", err)
+			os.Exit(1)
+		}
+
+		barcodes = append(barcodes, barcode)
+	}
+
+	return barcodes
+}
+
+func savePDF(barcodes []barcode, pageSize pdfPageSize) error {
+	pdf := newPdf(pageSize, time.Now)
+	for _, barcode := range barcodes {
+		pdf.addBarcode(barcode)
+	}
+
+	filename := "barmycodes.pdf"
+	file, err := os.Create(filename)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error creating barcode:", err)
+		return fmt.Errorf("Error creating file: %s", err)
+	}
+
+	err = pdf.write(file)
+	if err != nil {
 		file.Close()
-		os.Exit(1)
+		os.Remove(filename)
+		return fmt.Errorf("Error writing PDF: %s", err)
 	}
 
-	fmt.Println("Created", fileName, "with content:", cli.content)
+	fmt.Println("Created", filename, "with", len(barcodes), "barcodes")
+	return nil
+}
+
+func savePNGImages(barcodes []barcode) error {
+	for _, barcode := range barcodes {
+		filename := fmt.Sprintf("%s.png", barcode.value)
+		file, err := os.Create(filename)
+		if err != nil {
+			return fmt.Errorf("Error creating file: %s", err)
+		}
+		defer file.Close()
+
+		_, err = file.Write(barcode.pngData)
+		if err != nil {
+			file.Close()
+			os.Remove(filename)
+			return fmt.Errorf("Error writing file: %s", err)
+		}
+
+		fmt.Println("Created", filename, "with content:", barcode.value)
+	}
+
+	return nil
 }
