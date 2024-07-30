@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"bytes"
@@ -27,15 +27,15 @@ const (
 	qrCodePadding  = 60
 )
 
-type barcode struct {
-	pngData []byte
-	value   string
+type Barcode struct {
+	PngData []byte
+	Value   string
 	width   int
 	height  int
 }
 
-func generateBarcode(text string, barcodeType string) (barcode, error) {
-	bc := barcode{value: text}
+func GenerateBarcode(text string, barcodeType string) (Barcode, error) {
+	bc := Barcode{Value: text}
 	var img image.Image
 	var err error
 
@@ -48,23 +48,37 @@ func generateBarcode(text string, barcodeType string) (barcode, error) {
 	pngBuffer := new(bytes.Buffer)
 	err = png.Encode(pngBuffer, img)
 	if err != nil {
-		return barcode{}, err
+		return Barcode{}, err
 	}
 
-	bc.pngData = pngBuffer.Bytes()
+	bc.PngData = pngBuffer.Bytes()
 	return bc, nil
 }
 
-func generateCode128Barcode(bc *barcode) (image.Image, error) {
-	bcode, err := code128.Encode(bc.value)
+func GenerateBarcodes(values []string, barcodeType string) ([]Barcode, error) {
+	var barcodes []Barcode
+	for _, value := range values {
+		barcode, err := GenerateBarcode(value, barcodeType)
+		if err != nil {
+			return barcodes, err
+		}
+
+		barcodes = append(barcodes, barcode)
+	}
+
+	return barcodes, nil
+}
+
+func generateCode128Barcode(bc *Barcode) (image.Image, error) {
+	bcode, err := code128.Encode(bc.Value)
 	if err != nil {
 		return nil, err
 	}
 
 	bc.height = 120
 	bc.width = bcode.Bounds().Dx() * 3
-	if len(bc.value) >= 10 {
-		bc.width += len(bc.value) * 15
+	if len(bc.Value) >= 10 {
+		bc.width += len(bc.Value) * 15
 	}
 
 	scaledBc, err := bBarcode.Scale(bcode, bc.width, bc.height)
@@ -75,10 +89,10 @@ func generateCode128Barcode(bc *barcode) (image.Image, error) {
 	return addLabel(scaledBc), nil
 }
 
-func generateQRCode(bc *barcode) (image.Image, error) {
+func generateQRCode(bc *Barcode) (image.Image, error) {
 	bc.height = 245
 	bc.width = 245
-	bcode, err := qr.Encode(bc.value, qr.H, qr.Unicode)
+	bcode, err := qr.Encode(bc.Value, qr.H, qr.Unicode)
 	if err != nil {
 		return nil, err
 	}

@@ -1,12 +1,14 @@
-package main
+package internal_test
 
 import (
 	"bytes"
 	"os"
 	"testing"
+
+	"github.com/robyparr/barmycodes/internal"
 )
 
-func TestNewCode128BarCode(t *testing.T) {
+func TestGenerateBarcode(t *testing.T) {
 	testCases := []struct {
 		name        string
 		value       string
@@ -25,13 +27,13 @@ func TestNewCode128BarCode(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			got, err := generateBarcode(testCase.value, testCase.barcodeType)
+			got, err := internal.GenerateBarcode(testCase.value, testCase.barcodeType)
 
 			if err != nil {
 				t.Fatalf("Expected no error but got %s\n", err)
 			}
 
-			if !bytes.Equal(got.pngData, wantContent) {
+			if !bytes.Equal(got.PngData, wantContent) {
 				t.Errorf("Generated barcode does not match %s\n", testCase.fixturePath)
 			}
 		})

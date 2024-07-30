@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/robyparr/barmycodes/internal"
 )
 
 func main() {
-	cli := cli{}
-	cli.parse()
+	cli := parseCLI()
 
-	barcodes, err := generateBarcodes(cli.values, cli.barcodeType)
+	barcodes, err := internal.GenerateBarcodes(cli.values, cli.barcodeType)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -28,24 +29,10 @@ func main() {
 	}
 }
 
-func generateBarcodes(values []string, barcodeType string) ([]barcode, error) {
-	var barcodes []barcode
-	for _, value := range values {
-		barcode, err := generateBarcode(value, barcodeType)
-		if err != nil {
-			return barcodes, err
-		}
-
-		barcodes = append(barcodes, barcode)
-	}
-
-	return barcodes, nil
-}
-
-func savePDF(barcodes []barcode, pageSize pdfPageSize) error {
-	pdf := newPdf(pageSize, time.Now)
+func savePDF(barcodes []internal.Barcode, pageSize internal.PDFPageSize) error {
+	pdf := internal.NewPdf(pageSize, time.Now)
 	for _, barcode := range barcodes {
-		pdf.addBarcode(barcode)
+		pdf.AddBarcode(barcode)
 	}
 
 	filename := "barmycodes.pdf"
@@ -54,7 +41,7 @@ func savePDF(barcodes []barcode, pageSize pdfPageSize) error {
 		return fmt.Errorf("Error creating file: %s", err)
 	}
 
-	err = pdf.write(file)
+	err = pdf.Write(file)
 	if err != nil {
 		file.Close()
 		os.Remove(filename)
@@ -65,9 +52,9 @@ func savePDF(barcodes []barcode, pageSize pdfPageSize) error {
 	return nil
 }
 
-func savePNGImages(barcodes []barcode) error {
+func savePNGImages(barcodes []internal.Barcode) error {
 	for _, barcode := range barcodes {
-		filename := fmt.Sprintf("%s.png", barcode.value)
+		filename := fmt.Sprintf("%s.png", barcode.Value)
 
 		file, err := os.Create(filename)
 		if err != nil {
@@ -75,14 +62,14 @@ func savePNGImages(barcodes []barcode) error {
 		}
 		defer file.Close()
 
-		_, err = file.Write(barcode.pngData)
+		_, err = file.Write(barcode.PngData)
 		if err != nil {
 			file.Close()
 			os.Remove(filename)
 			return fmt.Errorf("Error writing file: %s", err)
 		}
 
-		fmt.Println("Created", filename, "with content:", barcode.value)
+		fmt.Println("Created", filename, "with content:", barcode.Value)
 	}
 
 	return nil

@@ -4,30 +4,34 @@ import (
 	"flag"
 	"strconv"
 	"strings"
+
+	"github.com/robyparr/barmycodes/internal"
 )
 
 type cli struct {
 	values      []string
 	barcodeType string
 	fileType    string
-	pdfPageSize pdfPageSize
+	pdfPageSize internal.PDFPageSize
 }
 
-func (c *cli) parse() {
+func parseCLI() cli {
 	fileTypeFlag := flag.String("f", "png", "The output file type: pdf or png")
 	barcodeTypeFlag := flag.String("t", "code128", "The barcode type: code128 or qr")
 	pdfPageSizeFlag := flag.String("s", "", "PDF page size: NNxNNmm or NNxNNin")
 	flag.Parse()
 
-	c.values = flag.Args()
-	c.barcodeType = strings.ToLower(*barcodeTypeFlag)
-	c.fileType = strings.ToLower(*fileTypeFlag)
-	c.pdfPageSize = parsePdfPageSize(strings.ToLower(*pdfPageSizeFlag))
+	return cli{
+		values:      flag.Args(),
+		barcodeType: strings.ToLower(*barcodeTypeFlag),
+		fileType:    strings.ToLower(*fileTypeFlag),
+		pdfPageSize: parsePdfPageSize(strings.ToLower(*pdfPageSizeFlag)),
+	}
 }
 
-func parsePdfPageSize(str string) pdfPageSize {
+func parsePdfPageSize(str string) internal.PDFPageSize {
 	if str == "" {
-		return pdfPageSize{}
+		return internal.PDFPageSize{}
 	}
 
 	values := strings.SplitN(str, "x", 2)
@@ -35,9 +39,9 @@ func parsePdfPageSize(str string) pdfPageSize {
 
 	width, _ := strconv.Atoi(values[0])
 	height, _ := strconv.Atoi(values[1][:len(values[1])-2])
-	return pdfPageSize{
-		width:  width,
-		height: height,
-		unit:   unit,
+	return internal.PDFPageSize{
+		Width:  width,
+		Height: height,
+		Unit:   unit,
 	}
 }
