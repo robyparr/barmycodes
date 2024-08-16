@@ -1,4 +1,6 @@
 const barcodeInput = document.querySelector("#barcode-values");
+const KEYCODE_ENTER = 13;
+const KEYCODE_CTRL_ENTER = 10;
 
 window.addEventListener("load", function () {
   const urlSearchParams = new URLSearchParams(window.location.search);
@@ -33,7 +35,7 @@ document
   .addEventListener("click", generateBarcodes);
 
 barcodeInput.addEventListener("keydown", function (e) {
-  if ((e.ctrlKey || e.metaKey) && (e.keyCode === 13 || e.keyCode === 10)) {
+  if ((e.ctrlKey || e.metaKey) && (e.keyCode === KEYCODE_ENTER || e.keyCode === KEYCODE_CTRL_ENTER)) {
     generateBarcodes();
   }
 });
