@@ -3,6 +3,12 @@ const barcodeInput = document.querySelector("#barcode-values");
 window.addEventListener("load", function () {
   const urlSearchParams = new URLSearchParams(window.location.search);
   barcodeInput.value = urlSearchParams.getAll("b[]").join("\n");
+
+  const selectedType = urlSearchParams.get('type');
+  if (!selectedType) return;
+
+  const barcodeType = document.querySelector(`input[name="type"][value="${selectedType}"]`);
+  barcodeType.checked = true;
 });
 
 function generateBarcodes() {
