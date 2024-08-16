@@ -1,0 +1,55 @@
+{{ template "layout.html.tmpl" . }}
+
+{{ define "content" }}
+<div class="sidebar-layout">
+  <div class="sidebar">
+    <h1>Bar My Codes</h1>
+
+    <label class="barcodes" for="barcode-values">Barcodes</label>
+    <textarea
+      id="barcode-values"
+      autofocus="autofocus"
+      placeholder="Enter each of your barcodes on a new line."
+    ></textarea>
+    <small>Press Ctrl/CMD + Enter to generate barcodes.</small>
+
+    <div class="actions">
+      <div>
+        <input
+          id="type-code128"
+          type="radio"
+          name="type"
+          value="Code128"
+          checked="checked"
+        />
+        <label for="type-code128">Code128</label>
+
+        <input
+          id="type-qr"
+          type="radio"
+          name="type"
+          value="QR"
+        />
+        <label for="type-qr">QR</label>
+      </div>
+
+      <button type="submit" id="generate-barcodes">Bar My Codes!</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="barcode-container">
+      {{ if not . }}
+        <div class="placeholder">Your barcodes will showup here.<br />Try it out to the left.</div>
+      {{ else }}
+        {{ range . }}
+          <div class="barcode">
+            <div class="title">{{ .Value }}</div>
+            <img src="data:image/png;base64, {{ .Base64 }}" />
+            <div class="footer">PNG PDF</div>
+          </div>
+        {{ end }}
+      {{ end }}
+    </div>
+  </div>
+{{ end }}

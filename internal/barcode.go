@@ -2,10 +2,12 @@ package internal
 
 import (
 	"bytes"
+	"encoding/base64"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/png"
+	"strings"
 
 	bBarcode "github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/code128"
@@ -29,17 +31,22 @@ const (
 
 type Barcode struct {
 	PngData []byte
+	Type    string
 	Value   string
 	width   int
 	height  int
 }
 
+func (b Barcode) Base64() string {
+	return base64.RawStdEncoding.EncodeToString(b.PngData)
+}
+
 func GenerateBarcode(text string, barcodeType string) (Barcode, error) {
-	bc := Barcode{Value: text}
+	bc := Barcode{Type: barcodeType, Value: text}
 	var img image.Image
 	var err error
 
-	if barcodeType == "qr" {
+	if strings.ToLower(barcodeType) == "qr" {
 		img, err = generateQRCode(&bc)
 	} else {
 		img, err = generateCode128Barcode(&bc)
