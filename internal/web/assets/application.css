@@ -99,9 +99,10 @@ body {
     justify-content: space-between;
 
     background-color: white;
-    max-height: 285px;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
+
+    img { max-height: 285px; }
 
     .title {
       background-color: var(--primary-color);
