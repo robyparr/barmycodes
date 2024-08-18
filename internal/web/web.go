@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/robyparr/barmycodes/internal"
@@ -48,11 +49,24 @@ func (router Router) downloadPNGHandler(w http.ResponseWriter, r *http.Request) 
 
 func (router Router) downloadPDFHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-	barcode, _ := internal.GenerateBarcode(query.Get("b[]"), query.Get("type"))
+	barcodes, _ := internal.GenerateBarcodes(query["b[]"], query.Get("type"))
+
+	pageSize := internal.PDFPageSize{}
+	if unit := query.Get("measurement"); unit != "auto" {
+		pageSize.Unit = unit
+
+		width, _ := strconv.Atoi(query.Get("width"))
+		pageSize.Width = width
+
+		height, _ := strconv.Atoi(query.Get("height"))
+		pageSize.Height = height
+	}
 
 	buffer := new(bytes.Buffer)
-	pdf := internal.NewPdf(internal.PDFPageSize{}, router.NowFunc)
-	pdf.AddBarcode(barcode)
+	pdf := internal.NewPdf(pageSize, router.NowFunc)
+	for _, barcode := range barcodes {
+		pdf.AddBarcode(barcode)
+	}
 	pdf.Write(buffer)
 
 	w.Header().Set("Content-Disposition", "attachment; filename=barmycodes.pdf")

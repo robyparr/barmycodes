@@ -30,12 +30,17 @@ function generateBarcodes() {
   window.location.href = baseURL + "?" + params.join("&");
 }
 
-document
-  .querySelector("#generate-barcodes")
-  .addEventListener("click", generateBarcodes);
+document.querySelector("#generate-barcodes").addEventListener("click", generateBarcodes);
 
 barcodeInput.addEventListener("keydown", function (e) {
   if ((e.ctrlKey || e.metaKey) && (e.keyCode === KEYCODE_ENTER || e.keyCode === KEYCODE_CTRL_ENTER)) {
     generateBarcodes();
   }
 });
+
+const pdfUnitSelector = document.querySelector('#pdf-unit');
+const dimensionInputs = document.querySelectorAll('.dimension-input');
+pdfUnitSelector.addEventListener('change', function(e) {
+  const showDimensionInputs = e.target.value !== 'auto';
+  dimensionInputs.forEach(input => showDimensionInputs ? input.style.display = 'inherit' : input.style.display = 'none');
+})

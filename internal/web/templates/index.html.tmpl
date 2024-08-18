@@ -33,8 +33,48 @@
         <label for="type-qr">QR</label>
       </div>
 
-      <button type="submit" id="generate-barcodes">Bar My Codes!</button>
+      <button type="submit" id="generate-barcodes" class="button primary">Bar My Codes!</button>
     </div>
+
+    {{ if . }}
+      <form class="pdf-export" action="/pdf" method="GET">
+        <input type="hidden" name="type" value="{{ (index . 0).Type }}" />
+        {{ range . }}<input type="hidden" name="b[]" value="{{ .Value }}" />{{ end }}
+
+        <div class="title">PDF Export</div>
+
+        <div class="control">
+          <label for="measurement">Measurement</label>
+          <select id="measurement" name="measurement">
+            <option value="auto">Auto</option>
+            <option value="inch">inches</option>
+            <option value="mm">millimeters</option>
+          </select>
+        </div>
+
+        <div class="control dimension-input" style="display: none;">
+          <label for="pdf-width">Width</label>
+          <input
+            type="text"
+            id="pdf-width"
+            name="width"
+            placeholder="Page width"
+          />
+        </div>
+
+        <div class="control dimension-input" style="display: none;">
+          <label for="pdf-height">Height</label>
+          <input
+            type="text"
+            id="pdf-height"
+            name="height"
+            placeholder="Page height"
+          />
+        </div>
+
+        <button type="submit" class="button">Export to PDF</button>
+      </form>
+    {{ end }}
   </div>
 
   <div class="content">

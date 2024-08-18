@@ -15,6 +15,30 @@ a {
   color: #337ab7;
 }
 
+.button {
+  background-color: #fff;
+  border-color: #ccc;
+  border-radius: var(--border-radius);
+  padding: 8px 14px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #e6e6e6;
+    border-color: #adadad;
+  }
+
+  &.primary {
+    background-color: #337ab7;
+    border: 1px solid #2e6da4;
+    color: white;
+
+    &:hover {
+      background-color: #286090;
+      border-color: #204d74;
+    }
+  }
+}
+
 .sidebar-layout {
   display: flex;
   height: 100vh;
@@ -56,18 +80,27 @@ a {
       justify-content: space-between;
       align-items: center;
       margin-top: 15px;
+    }
 
-      #generate-barcodes {
-        background-color: #337ab7;
-        border: 1px solid #2e6da4;
-        border-radius: var(--border-radius);
-        padding: 8px 14px;
-        color: white;
-        cursor: pointer;
+    .pdf-export {
+      margin-top: 25px;
+      text-align: right;
 
-        &:hover {
-          background-color: #286090;
-          border-color: #204d74;
+      .title {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .control {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+
+        input, select {
+          margin-left: 15px;
+          width: 60%;
         }
       }
     }

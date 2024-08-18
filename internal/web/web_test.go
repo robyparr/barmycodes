@@ -57,12 +57,42 @@ func TestDownloadPNG(t *testing.T) {
 func TestDownloadPDF(t *testing.T) {
 	router := web.NewRouter(nowFuncStub)
 
-	request, _ := http.NewRequest(http.MethodGet, "/pdf?type=Code128&b[]=Test", nil)
-	response := httptest.NewRecorder()
+	t.Run("Download a single barcode PDF", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/pdf?type=Code128&b[]=Test", nil)
+		response := httptest.NewRecorder()
 
-	router.ServeHTTP(response, request)
-	assertStatus(t, response.Code, http.StatusOK)
-	assertBodyIsFixture(t, response.Body.Bytes(), "../testdata/barcode_Test.pdf")
+		router.ServeHTTP(response, request)
+		assertStatus(t, response.Code, http.StatusOK)
+		assertBodyIsFixture(t, response.Body.Bytes(), "../testdata/barcode_Test.pdf")
+	})
+
+	t.Run("Download a multi barcode PDF", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/pdf?type=Code128&b[]=Test1&b[]=Test2", nil)
+		response := httptest.NewRecorder()
+
+		router.ServeHTTP(response, request)
+		assertStatus(t, response.Code, http.StatusOK)
+		assertBodyIsFixture(t, response.Body.Bytes(), "../testdata/barcode_Test1_Test2.pdf")
+	})
+
+	t.Run("Download a PDF with custom mm dimensions", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/pdf?type=Code128&b[]=Test&measurement=mm&width=100&height=100", nil)
+		response := httptest.NewRecorder()
+
+		router.ServeHTTP(response, request)
+		assertStatus(t, response.Code, http.StatusOK)
+		assertBodyIsFixture(t, response.Body.Bytes(), "../testdata/barcode_Test_100x100mm.pdf")
+	})
+
+	t.Run("Download a PDF with custom inch dimensions", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/pdf?type=Code128&b[]=Test&measurement=inch&width=10&height=10", nil)
+		response := httptest.NewRecorder()
+
+		router.ServeHTTP(response, request)
+		assertStatus(t, response.Code, http.StatusOK)
+		assertBodyIsFixture(t, response.Body.Bytes(), "../testdata/barcode_Test_10x10in.pdf")
+	})
+
 }
 
 func TestUnknownURL(t *testing.T) {
