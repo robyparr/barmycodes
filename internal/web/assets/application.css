@@ -10,6 +10,11 @@ body {
   overflow-y: hidden;
 }
 
+a {
+  text-decoration: none;
+  color: #337ab7;
+}
+
 .sidebar-layout {
   display: flex;
   height: 100vh;
@@ -125,6 +130,8 @@ body {
       border-top: 1px solid var(--border-color);
       border-bottom-left-radius: var(--border-radius);
       border-bottom-right-radius: var(--border-radius);
+
+      * + * { margin-left: 10px; }
     }
   }
 }

@@ -1,9 +1,12 @@
 package web
 
 import (
+	"bytes"
 	"embed"
+	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 
 	"github.com/robyparr/barmycodes/internal"
 )
@@ -15,18 +18,50 @@ var templatesFS embed.FS
 var assetsFS embed.FS
 var tmpl = template.Must(template.ParseFS(templatesFS, "templates/*.tmpl"))
 
-func NewRouter() http.Handler {
-	router := http.NewServeMux()
-	router.Handle("GET /assets/", http.FileServerFS(assetsFS))
-	router.HandleFunc("GET /", mainHandler)
-
-	return router
+type Router struct {
+	NowFunc func() time.Time
+	http.Handler
 }
 
-func mainHandler(w http.ResponseWriter, r *http.Request) {
-	barcodeType := r.URL.Query().Get("type")
-	barcodeValues := r.URL.Query()["b[]"]
-	barcodes, _ := internal.GenerateBarcodes(barcodeValues, barcodeType)
+type nowFunc func() time.Time
+
+func (router Router) mainHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	barcodes, _ := internal.GenerateBarcodes(query["b[]"], query.Get("type"))
 
 	tmpl.ExecuteTemplate(w, "index.html.tmpl", barcodes)
+}
+
+func (router Router) downloadPNGHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	barcode, _ := internal.GenerateBarcode(query.Get("b[]"), query.Get("type"))
+
+	w.Header().Set("Content-Disposition", "attachment; filename=barmycodes.png")
+	w.Write(barcode.PngData)
+}
+
+func (router Router) downloadPDFHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	barcode, _ := internal.GenerateBarcode(query.Get("b[]"), query.Get("type"))
+
+	buffer := new(bytes.Buffer)
+	pdf := internal.NewPdf(internal.PDFPageSize{}, router.NowFunc)
+	pdf.AddBarcode(barcode)
+	pdf.Write(buffer)
+
+	w.Header().Set("Content-Disposition", "attachment; filename=barmycodes.pdf")
+	w.Write(buffer.Bytes())
+}
+
+func NewRouter(now nowFunc) Router {
+	router := Router{NowFunc: now}
+
+	mux := http.NewServeMux()
+	mux.Handle("GET /assets/", http.FileServerFS(assetsFS))
+	mux.HandleFunc("GET /png", router.downloadPNGHandler)
+	mux.HandleFunc("GET /pdf", router.downloadPDFHandler)
+	mux.HandleFunc("GET /", router.mainHandler)
+
+	router.Handler = mux
+	return router
 }
