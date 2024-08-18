@@ -26,6 +26,12 @@ type Router struct {
 type nowFunc func() time.Time
 
 func (router Router) mainHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintln(w, "404: The page you're looking for could not be found.")
+		return
+	}
+
 	query := r.URL.Query()
 	barcodes, _ := internal.GenerateBarcodes(query["b[]"], query.Get("type"))
 

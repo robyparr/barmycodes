@@ -65,6 +65,16 @@ func TestDownloadPDF(t *testing.T) {
 	assertBodyIsFixture(t, response.Body.Bytes(), "../testdata/barcode_Test.pdf")
 }
 
+func TestUnknownURL(t *testing.T) {
+	router := web.NewRouter(time.Now)
+	request, _ := http.NewRequest(http.MethodGet, "/unknown", nil)
+	response := httptest.NewRecorder()
+
+	router.ServeHTTP(response, request)
+	assertStatus(t, response.Code, http.StatusNotFound)
+	assertBodyContains(t, response.Body.String(), "404: The page you're looking for could not be found.")
+}
+
 func assertStatus(t *testing.T, got int, want int) {
 	if got != want {
 		t.Errorf("Unexpected response status. Got %d, want %d.", got, want)
