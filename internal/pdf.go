@@ -63,8 +63,8 @@ func NewPdf(pageSize PDFPageSize, now nowFunc) pdf {
 	}
 
 	pdf.fpdf = fpdf.New(pageFormatPortrait, unit, pageSizeA4, "")
-	pdf.fpdf.SetCreationDate(now())
-	pdf.fpdf.SetModificationDate(now())
+	pdf.fpdf.SetCreationDate(now().UTC())
+	pdf.fpdf.SetModificationDate(now().UTC())
 
 	return pdf
 }
