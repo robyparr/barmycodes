@@ -14,26 +14,24 @@
     <small>Press Ctrl/CMD + Enter to generate barcodes.</small>
 
     <div class="actions">
-      <div>
-        <input
-          id="type-code128"
-          type="radio"
-          name="type"
-          value="Code128"
-          checked="checked"
-        />
-        <label for="type-code128">Code128</label>
+      <input
+        id="type-code128"
+        type="radio"
+        name="type"
+        value="Code128"
+        checked="checked"
+      />
+      <label for="type-code128">Code128</label>
 
-        <input
-          id="type-qr"
-          type="radio"
-          name="type"
-          value="QR"
-        />
-        <label for="type-qr">QR</label>
-      </div>
+      <input
+        id="type-qr"
+        type="radio"
+        name="type"
+        value="QR"
+      />
+      <label for="type-qr">QR</label>
 
-      <button type="submit" id="generate-barcodes" class="button primary">Bar My Codes!</button>
+      <button type="submit" id="generate-barcodes" class="button primary ml-auto">Bar My Codes!</button>
     </div>
 
     {{ if . }}

@@ -8,6 +8,7 @@ body {
   background-color: #eee;
   margin: 0;
   overflow-y: hidden;
+  font-family: sans-serif;
 }
 
 a {
@@ -15,10 +16,13 @@ a {
   color: #337ab7;
 }
 
+.ml-auto { margin-left: auto; }
+
 .button {
   background-color: #fff;
   border-color: #ccc;
   border-radius: var(--border-radius);
+  border-style: initial;
   padding: 8px 14px;
   cursor: pointer;
 
@@ -47,6 +51,7 @@ a {
     background-color: var(--primary-color);
     color: white;
     width: 25%;
+    max-width: 400px;
     padding: 10px 20px;
 
     h1 {
@@ -65,21 +70,27 @@ a {
     }
 
     textarea {
+      box-sizing: border-box;
       width: 100%;
-      min-height: 100px;
+      min-height: 150px;
+      resize: vertical;
     }
 
     small {
       display: block;
-      opacity: 0.9;
+      opacity: 0.7;
       text-align: right;
     }
 
     .actions {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       margin-top: 15px;
+
+      label {
+        margin-left: 5px;
+        margin-right: 10px;
+      }
     }
 
     .pdf-export {
@@ -102,6 +113,8 @@ a {
           margin-left: 15px;
           width: 60%;
         }
+
+        select { appearance: menulist-button; }
       }
     }
   }
@@ -118,6 +131,7 @@ a {
   display: grid;
   grid-template-columns: 50% 50%;
   grid-gap: 15px;
+  width: calc(100% - 15px);
 
   .placeholder {
     grid-column: 1/3;
