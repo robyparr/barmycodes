@@ -38,7 +38,7 @@ barcodeInput.addEventListener("keydown", function (e) {
   }
 });
 
-const pdfUnitSelector = document.querySelector('#pdf-unit');
+const pdfUnitSelector = document.querySelector('#measurement');
 const dimensionInputs = document.querySelectorAll('.dimension-input');
 pdfUnitSelector.addEventListener('change', function(e) {
   const showDimensionInputs = e.target.value !== 'auto';
