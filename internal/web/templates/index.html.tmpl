@@ -34,10 +34,10 @@
       <button type="submit" id="generate-barcodes" class="button primary ml-auto">Bar My Codes!</button>
     </div>
 
-    {{ if . }}
+    {{ if .Barcodes }}
       <form class="pdf-export" action="/pdf" method="GET">
-        <input type="hidden" name="type" value="{{ (index . 0).Type }}" />
-        {{ range . }}<input type="hidden" name="b[]" value="{{ .Value }}" />{{ end }}
+        <input type="hidden" name="type" value="{{ .BarcodeType }}" />
+        {{ range .Barcodes }}<input type="hidden" name="b[]" value="{{ .Value }}" />{{ end }}
 
         <div class="title">PDF Export</div>
 
@@ -76,11 +76,14 @@
   </div>
 
   <div class="content">
+    {{ if .ErrorMessage }}
+      <div class="alert error">{{ .ErrorMessage }}</div>
+    {{ end }}
     <div class="barcode-container">
-      {{ if not . }}
+      {{ if not .Barcodes }}
         <div class="placeholder">Your barcodes will showup here.<br />Try it out to the left.</div>
       {{ else }}
-        {{ range . }}
+        {{ range .Barcodes }}
           <div class="barcode">
             <div class="title">{{ .Value }}</div>
             <img src="data:image/png;base64, {{ .Base64 }}" />

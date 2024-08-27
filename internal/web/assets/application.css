@@ -43,6 +43,20 @@ a {
   }
 }
 
+.alert {
+  padding: 15px 10px;
+  margin-bottom: 15px;
+  border-radius: var(--border-radius);
+  border-width: 1px;
+  border-style: solid;
+
+  &.error {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+  }
+}
+
 .sidebar-layout {
   display: flex;
   height: 100vh;

@@ -52,6 +52,10 @@ func GenerateBarcode(text string, barcodeType string) (Barcode, error) {
 		img, err = generateCode128Barcode(&bc)
 	}
 
+	if err != nil {
+		return Barcode{}, err
+	}
+
 	pngBuffer := new(bytes.Buffer)
 	err = png.Encode(pngBuffer, img)
 	if err != nil {
