@@ -43,6 +43,12 @@ func (router Router) mainHandler(w http.ResponseWriter, r *http.Request) {
 
 	query := r.URL.Query()
 	vm := viewModel{BarcodeType: query.Get("type")}
+	if len(query["b[]"]) > 25 {
+		vm.ErrorMessage = "You cannot generate more than 25 barcodes at one time."
+		tmpl.ExecuteTemplate(w, "index.html.tmpl", vm)
+		return
+	}
+
 	barcodes, err := internal.GenerateBarcodes(query["b[]"], vm.BarcodeType)
 	if err != nil {
 		vm.ErrorMessage = "An unexpected error occurred while generating barcodes."
@@ -70,6 +76,12 @@ func (router Router) downloadPNGHandler(w http.ResponseWriter, r *http.Request) 
 func (router Router) downloadPDFHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	vm := viewModel{BarcodeType: query.Get("type")}
+	if len(query["b[]"]) > 25 {
+		vm.ErrorMessage = "You cannot generate more than 25 barcodes at one time."
+		tmpl.ExecuteTemplate(w, "index.html.tmpl", vm)
+		return
+	}
+
 	barcodes, err := internal.GenerateBarcodes(query["b[]"], vm.BarcodeType)
 	if err != nil {
 		vm.ErrorMessage = "An unexpected error occurred while generating barcodes."
