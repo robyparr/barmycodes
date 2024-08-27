@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -98,11 +99,21 @@ func (router Router) downloadPDFHandler(w http.ResponseWriter, r *http.Request) 
 func NewRouter(now nowFunc) Router {
 	router := Router{NowFunc: now}
 
+	loggingMiddleware := func(next http.HandlerFunc) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+			next(w, r)
+			elapsedTime := time.Since(start).Truncate(time.Millisecond)
+
+			log.Printf("%s %s in %s\n", r.Method, r.URL.Path, elapsedTime)
+		})
+	}
+
 	mux := http.NewServeMux()
 	mux.Handle("GET /assets/", http.FileServerFS(assetsFS))
-	mux.HandleFunc("GET /png", router.downloadPNGHandler)
-	mux.HandleFunc("GET /pdf", router.downloadPDFHandler)
-	mux.HandleFunc("GET /", router.mainHandler)
+	mux.Handle("GET /png", loggingMiddleware(router.downloadPNGHandler))
+	mux.Handle("GET /pdf", loggingMiddleware(router.downloadPDFHandler))
+	mux.Handle("GET /", loggingMiddleware(router.mainHandler))
 
 	router.Handler = mux
 	return router
