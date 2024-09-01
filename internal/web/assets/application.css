@@ -60,6 +60,7 @@ a {
 .sidebar-layout {
   display: flex;
   height: 100vh;
+  overflow: hidden;
 
   .sidebar {
     background-color: var(--primary-color);
@@ -134,7 +135,7 @@ a {
   }
 
   .content {
-    height: 100vh;
+    box-sizing: border-box;
     width: 100%;
     padding: 15px;
     overflow-y: auto;
@@ -145,6 +146,7 @@ a {
   display: grid;
   grid-template-columns: 50% 50%;
   grid-gap: 15px;
+  width: 100%;
   width: calc(100% - 15px);
 
   .placeholder {
@@ -194,5 +196,35 @@ a {
 
       * + * { margin-left: 10px; }
     }
+  }
+}
+
+@media (max-width: 992px) {
+  body {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .sidebar-layout {
+    box-sizing: border-box;
+    flex-direction: column;
+    height: fit-content;
+    overflow-y: auto;
+
+    .sidebar {
+      box-sizing: border-box;
+      width: 100vw;
+      max-width: none;
+    }
+
+    .content {
+      overflow: hidden;
+      height: fit-content;
+    }
+  }
+
+  .barcode-container {
+    grid-template-columns: 100%;
+    width: 100%;
   }
 }
