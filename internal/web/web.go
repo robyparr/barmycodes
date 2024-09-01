@@ -108,6 +108,11 @@ func (router Router) downloadPDFHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write(buffer.Bytes())
 }
 
+func (router Router) privacyHandler(w http.ResponseWriter, r *http.Request) {
+	vm := new(viewModel)
+	tmpl.ExecuteTemplate(w, "privacy.html.tmpl", vm)
+}
+
 func NewRouter(now nowFunc) Router {
 	router := Router{NowFunc: now}
 
@@ -125,6 +130,7 @@ func NewRouter(now nowFunc) Router {
 	mux.Handle("GET /assets/", http.FileServerFS(assetsFS))
 	mux.Handle("GET /png", loggingMiddleware(router.downloadPNGHandler))
 	mux.Handle("GET /pdf", loggingMiddleware(router.downloadPDFHandler))
+	mux.Handle("GET /privacy", loggingMiddleware(router.privacyHandler))
 	mux.Handle("GET /", loggingMiddleware(router.mainHandler))
 
 	router.Handler = mux

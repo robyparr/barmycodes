@@ -1,14 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Bar My Codes</title>
+{{define "layout_top"}}
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8"/>
+      <meta name="viewport" content="width=device-width,initial-scale=1.0">
+      <title>Bar My Codes</title>
 
-    <link rel="stylesheet" href="assets/application.css?v=20240804" />
-    <script defer src="assets/application.js?v=20240804"></script>
-  </head>
-  <body>
-    {{ block "content" . }}{{ end }}
-  </body>
-</html>
+      <link rel="stylesheet" href="assets/application.css?v=20240804" />
+      <script defer src="assets/application.js?v=20240804"></script>
+    </head>
+    <body>
+      <div class="sidebar-layout">
+        <div class="sidebar">
+          <div>
+            <h1>Bar My Codes</h1>
+
+            <label class="barcodes" for="barcode-values">Barcodes</label>
+            <textarea
+              id="barcode-values"
+              autofocus="autofocus"
+              placeholder="Enter each of your barcodes on a new line."
+            ></textarea>
+            <small>Press Ctrl/CMD + Enter to generate barcodes.</small>
+
+            <div class="actions">
+              <input
+                id="type-code128"
+                type="radio"
+                name="type"
+                value="Code128"
+                checked="checked"
+              />
+              <label for="type-code128">Code128</label>
+
+              <input
+                id="type-qr"
+                type="radio"
+                name="type"
+                value="QR"
+              />
+              <label for="type-qr">QR</label>
+
+              <button type="submit" id="generate-barcodes" class="button primary ml-auto">Bar My Codes!</button>
+            </div>
+
+            {{ if .Barcodes }}
+              <form class="pdf-export" action="/pdf" method="GET">
+                <input type="hidden" name="type" value="{{ .BarcodeType }}" />
+                {{ range .Barcodes }}<input type="hidden" name="b[]" value="{{ .Value }}" />{{ end }}
+
+                <div class="title">PDF Export</div>
+
+                <div class="control">
+                  <label for="measurement">Measurement</label>
+                  <select id="measurement" name="measurement">
+                    <option value="auto">Auto</option>
+                    <option value="inch">inches</option>
+                    <option value="mm">millimeters</option>
+                  </select>
+                </div>
+
+                <div class="control dimension-input" style="display: none;">
+                  <label for="pdf-width">Width</label>
+                  <input
+                    type="text"
+                    id="pdf-width"
+                    name="width"
+                    placeholder="Page width"
+                  />
+                </div>
+
+                <div class="control dimension-input" style="display: none;">
+                  <label for="pdf-height">Height</label>
+                  <input
+                    type="text"
+                    id="pdf-height"
+                    name="height"
+                    placeholder="Page height"
+                  />
+                </div>
+
+                <button type="submit" class="button">Export to PDF</button>
+              </form>
+            {{ end }}
+          </div>
+
+          <div class="links">
+            <a href="/privacy">Privacy Policy</a>
+          </div>
+        </div>
+
+        <div class="content">
+{{ end }}
+
+{{ define "layout_bottom" }}
+        </div>
+      </div>
+    </body>
+  </html>
+{{ end }}
