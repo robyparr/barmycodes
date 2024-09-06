@@ -17,6 +17,8 @@ a {
 }
 
 .ml-auto { margin-left: auto; }
+.muted { color: #ccc; }
+.block { display: block; }
 
 .button {
   background-color: #fff;
@@ -273,7 +275,11 @@ a {
     margin-top: 30px;
   }
 
-  p {
+  p, ul {
     color: rgb(51, 65, 85);
+  }
+
+  ul li {
+    margin-bottom: 5px;
   }
 }

@@ -1,0 +1,32 @@
+{{ template "layout_top" . }}
+<article class="prose">
+  <h2>Attributions</h2>
+
+  <p>
+    Bar My Codes uses the following software and fonts:
+
+    <ul>
+      <li>
+        <strong class="block">
+          <a href="https://github.com/googlefonts/opensans">OpenSans-Regular font</a>
+          (<a href="https://openfontlicense.org/open-font-license-official-text/">License</a>)
+        </strong>
+        The font used in the Code128 barcode labels.
+      </li>
+      <li>
+        <strong class="block"><a href="https://github.com/boombuler/barcode">github.com/boombuler/barcode</a></strong>
+        Used for generating both Code128 and QR barcodes.
+      </li>
+      <li>
+        <strong class="block"><a href="https://github.com/go-pdf/fpdf">github.com/go-pdf/fpdf</a></strong>
+        Used for creating PDF files.
+      </li>
+      <li>
+        <strong class="block"><a href="https://golang.org/x/image">golang.org/x/image</a></strong>
+        Used for manipulating barcode image files.
+      </li>
+    </ul>
+  </p>
+</article>
+
+{{ template "layout_bottom" . }}
