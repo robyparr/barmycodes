@@ -8,7 +8,7 @@ body {
   background-color: #eee;
   margin: 0;
   overflow-y: hidden;
-  font-family: sans-serif;
+  font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
 a {
@@ -238,5 +238,42 @@ a {
   .barcode-container {
     grid-template-columns: 100%;
     width: 100%;
+  }
+}
+
+/* Based on some styles from Tailwind's typography plugin */
+.prose {
+  max-width: 700px;
+  font-size: 16px;
+  line-height: 1.6;
+
+  h2 {
+    font-size: 1.66em;
+    line-height: 1.33;
+    font-weight: 700;
+
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    font-size: 1.33em;
+    line-height: 1.5;
+
+    margin-bottom: 20px;
+  }
+
+  h4 {
+    font-size: inherit;
+    margin-bottom: 8px;
+  }
+
+  h3, h4 {
+    font-weight: 600;
+    margin-top: 30px;
+  }
+
+  p {
+    color: rgb(51, 65, 85);
   }
 }
