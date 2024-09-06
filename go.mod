@@ -1,3 +1,6 @@
+// +heroku goVersion 1.21
+// +heroku install ./cmd/server
+
 module github.com/robyparr/barmycodes
 
 go 1.22.5
