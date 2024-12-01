@@ -131,13 +131,26 @@ func NewRouter(now nowFunc) Router {
 		})
 	}
 
+	secureHeadersMiddleware := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:;")
+
+			w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
+			w.Header().Set("X-Content-Type-Options", "nosniff")
+			w.Header().Set("X-Frame-Options", "deny")
+			w.Header().Set("X-XSS-Protection", "0")
+
+			next.ServeHTTP(w, r)
+		})
+	}
+
 	mux := http.NewServeMux()
 	mux.Handle("GET /assets/", http.FileServerFS(assetsFS))
-	mux.Handle("GET /png", loggingMiddleware(router.downloadPNGHandler))
-	mux.Handle("GET /pdf", loggingMiddleware(router.downloadPDFHandler))
-	mux.Handle("GET /privacy", loggingMiddleware(router.privacyHandler))
-	mux.Handle("GET /attributions", loggingMiddleware(router.attributionsHandler))
-	mux.Handle("GET /", loggingMiddleware(router.mainHandler))
+	mux.Handle("GET /png", secureHeadersMiddleware(loggingMiddleware(router.downloadPNGHandler)))
+	mux.Handle("GET /pdf", secureHeadersMiddleware(loggingMiddleware(router.downloadPDFHandler)))
+	mux.Handle("GET /privacy", secureHeadersMiddleware(loggingMiddleware(router.privacyHandler)))
+	mux.Handle("GET /attributions", secureHeadersMiddleware(loggingMiddleware(router.attributionsHandler)))
+	mux.Handle("GET /", secureHeadersMiddleware(loggingMiddleware(router.mainHandler)))
 
 	router.Handler = mux
 	return router

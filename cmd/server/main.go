@@ -16,5 +16,12 @@ func main() {
 	}
 
 	router := web.NewRouter(time.Now)
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	server := &http.Server{
+		Addr:         ":" + port,
+		Handler:      router,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+	log.Fatal(server.ListenAndServe())
 }
