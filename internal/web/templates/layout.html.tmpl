@@ -97,6 +97,11 @@
 {{ define "layout_bottom" }}
         </div>
       </div>
+      <script src="assets/event-horizon.js?v=20241201"></script>
+      <script>
+        window.EVENT_HORIZON_PROJECT_KEY = '{{ .EventHorizonProjectKey }}';
+        eh('pageview')
+      </script>
     </body>
   </html>
 {{ end }}

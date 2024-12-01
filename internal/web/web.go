@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"time"
 
@@ -29,9 +30,16 @@ type Router struct {
 type nowFunc func() time.Time
 
 type viewModel struct {
-	Barcodes     []internal.Barcode
-	BarcodeType  string
-	ErrorMessage string
+	Barcodes               []internal.Barcode
+	BarcodeType            string
+	ErrorMessage           string
+	EventHorizonProjectKey string
+}
+
+func newViewModel() viewModel {
+	return viewModel{
+		EventHorizonProjectKey: os.Getenv("EVENT_HORIZON_PROJECT_KEY"),
+	}
 }
 
 func (router Router) mainHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +50,8 @@ func (router Router) mainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := r.URL.Query()
-	vm := viewModel{BarcodeType: query.Get("type")}
+	vm := newViewModel()
+	vm.BarcodeType = query.Get("type")
 	if len(query["b[]"]) > 25 {
 		vm.ErrorMessage = "You cannot generate more than 25 barcodes at one time."
 		tmpl.ExecuteTemplate(w, "index.html.tmpl", vm)
@@ -64,7 +73,8 @@ func (router Router) downloadPNGHandler(w http.ResponseWriter, r *http.Request) 
 	barcode, err := internal.GenerateBarcode(query.Get("b[]"), query.Get("type"))
 
 	if err != nil {
-		vm := viewModel{ErrorMessage: "An unexpected error occurred while generating the barcode."}
+		vm := newViewModel()
+		vm.ErrorMessage = "An unexpected error occurred while generating the barcode."
 		tmpl.ExecuteTemplate(w, "index.html.tmpl", vm)
 		return
 	}
@@ -75,7 +85,9 @@ func (router Router) downloadPNGHandler(w http.ResponseWriter, r *http.Request) 
 
 func (router Router) downloadPDFHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-	vm := viewModel{BarcodeType: query.Get("type")}
+	vm := newViewModel()
+	vm.BarcodeType = query.Get("type")
+
 	if len(query["b[]"]) > 25 {
 		vm.ErrorMessage = "You cannot generate more than 25 barcodes at one time."
 		tmpl.ExecuteTemplate(w, "index.html.tmpl", vm)
@@ -109,12 +121,12 @@ func (router Router) downloadPDFHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (router Router) privacyHandler(w http.ResponseWriter, r *http.Request) {
-	vm := new(viewModel)
+	vm := newViewModel()
 	tmpl.ExecuteTemplate(w, "privacy.html.tmpl", vm)
 }
 
 func (router Router) attributionsHandler(w http.ResponseWriter, r *http.Request) {
-	vm := new(viewModel)
+	vm := newViewModel()
 	tmpl.ExecuteTemplate(w, "attributions.html.tmpl", vm)
 }
 
@@ -133,7 +145,7 @@ func NewRouter(now nowFunc) Router {
 
 	secureHeadersMiddleware := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:;")
+			w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://event-horizon.robyparr.com")
 
 			w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
 			w.Header().Set("X-Content-Type-Options", "nosniff")
