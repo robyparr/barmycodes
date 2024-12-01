@@ -92,6 +92,9 @@
         </div>
 
         <div class="content">
+          {{ if .BannerMessage }}
+            <div class="alert">{{ .BannerMessage }}</div>
+          {{ end }}
 {{ end }}
 
 {{ define "layout_bottom" }}

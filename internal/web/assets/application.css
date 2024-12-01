@@ -52,6 +52,10 @@ a {
   border-width: 1px;
   border-style: solid;
 
+  background-color: rgb(219 234 254);
+  border-color: rgb(191 219 254);
+  color: rgb(29 78 216);
+
   &.error {
     background-color: #f2dede;
     border-color: #ebccd1;

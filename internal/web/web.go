@@ -34,11 +34,13 @@ type viewModel struct {
 	BarcodeType            string
 	ErrorMessage           string
 	EventHorizonProjectKey string
+	BannerMessage          string
 }
 
 func newViewModel() viewModel {
 	return viewModel{
 		EventHorizonProjectKey: os.Getenv("EVENT_HORIZON_PROJECT_KEY"),
+		BannerMessage:          os.Getenv("BANNER_MESSAGE"),
 	}
 }
 
