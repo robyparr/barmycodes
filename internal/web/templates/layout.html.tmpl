@@ -100,9 +100,9 @@
 {{ define "layout_bottom" }}
         </div>
       </div>
-      <script src="assets/event-horizon.js?v=20241201"></script>
+      <script src="https://eh.robyparr.com/static/js/lib/eh.js?v=2050426"></script>
       <script>
-        window.EVENT_HORIZON_PROJECT_KEY = '{{ .EventHorizonProjectKey }}';
+        window.EH_PROJECT_KEY = '{{ .EventHorizonProjectKey }}';
         eh('pageview')
       </script>
     </body>

@@ -147,7 +147,7 @@ func NewRouter(now nowFunc) Router {
 
 	secureHeadersMiddleware := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://event-horizon.robyparr.com")
+			w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline' https://eh.robyparr.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://eh.robyparr.com")
 
 			w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
 			w.Header().Set("X-Content-Type-Options", "nosniff")
